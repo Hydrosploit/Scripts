@@ -86,4 +86,4 @@ UIS.InputEnded:Connect(function(Input)
 		UnLockCursor()
 	end
 end)
-game.StarterGui:SetCore("SendNotification", {Title = "Right Mouse Button.", Text = "Aim Lock Activated", Duration = 10,})
+game.StarterGui:SetCore("SendNotification", {Title = "Working.", Text = "Script made by fuego#5997 https://discord.gg/KysCb7y9ZB", Duration = 10,})
