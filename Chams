@@ -1,0 +1,79 @@
+local highlightEnabled = true
+local refreshLoopRunning = false
+local playerChams = {} 
+
+local function createPlayerChams(player)
+    if not player.Character or not player.Character:IsDescendantOf(workspace) then return end
+    
+    local character = player.Character
+    local humanoid = character:FindFirstChildOfClass("Humanoid")
+    
+    if not humanoid then return end
+    
+    local chams = {}
+    
+    for _, part in ipairs(character:GetDescendants()) do
+        if part:IsA("BasePart") and part.Name ~= "HumanoidRootPart" then
+            local cham = Instance.new("BoxHandleAdornment")
+            cham.Size = part.Size
+            cham.Adornee = part
+            cham.AlwaysOnTop = true
+            cham.ZIndex = 5
+            cham.Color3 = Color3.new(0, 1, 0) 
+            cham.Transparency = 0.7 
+            cham.Parent = part
+            table.insert(chams, cham)
+        end
+    end
+    
+    playerChams[player] = chams
+end
+
+local function removePlayerChams(player)
+    local chams = playerChams[player]
+    if chams then
+        for _, cham in ipairs(chams) do
+            cham:Destroy()
+        end
+        playerChams[player] = nil
+    end
+end
+
+local function updatePlayerChams()
+    for _, player in ipairs(game.Players:GetPlayers()) do
+        if player.Character then
+            if highlightEnabled and not playerChams[player] then
+                createPlayerChams(player)
+            elseif not highlightEnabled and playerChams[player] then
+                removePlayerChams(player)
+            end
+        end
+    end
+end
+
+local function startChamsLoop()
+    if refreshLoopRunning then return end
+    refreshLoopRunning = true
+    coroutine.wrap(function()
+        while refreshLoopRunning do
+            updatePlayerChams()
+            wait(0.1) 
+        end
+    end)()
+end
+
+
+
+game.Players.PlayerAdded:Connect(function(player)
+    player.CharacterAdded:Connect(function(character)
+        if highlightEnabled then
+            createPlayerChams(player)
+        end
+    end)
+end)
+
+game.Players.PlayerRemoving:Connect(function(player)
+    removePlayerChams(player)
+end)
+
+startChamsLoop() 
